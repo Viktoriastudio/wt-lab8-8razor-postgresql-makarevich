@@ -5,6 +5,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Подключение к PostgreSQL
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+Console.WriteLine($"=== Строка подключения: {(string.IsNullOrEmpty(connectionString) ? "ПУСТАЯ!" : "ЕСТЬ")} ===");
+
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(connectionString));
 
@@ -18,16 +20,22 @@ using (var scope = app.Services.CreateScope())
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     try
     {
+        Console.WriteLine("=== Попытка подключения к БД и применения миграций... ===");
         db.Database.Migrate();
-        Console.WriteLine("=== База данных успешно подключена и миграции применены! ===");
+        Console.WriteLine("=== БАЗА ДАННЫХ УСПЕШНО ПОДКЛЮЧЕНА! ===");
     }
     catch (Exception ex)
     {
         Console.WriteLine("=== ОШИБКА ПОДКЛЮЧЕНИЯ К БД ===");
-        Console.WriteLine(ex.Message);
-        if (ex.InnerException != null)
-            Console.WriteLine("Inner: " + ex.InnerException.Message);
+        Console.WriteLine(ex.ToString());
+        // Не падаем, а продолжаем работу (чтобы сайт запустился и показал ошибку)
     }
+}
+
+if (!app.Environment.IsDevelopment())
+{
+    app.UseExceptionHandler("/Error");
+    app.UseHsts();
 }
 
 app.UseHttpsRedirection();
