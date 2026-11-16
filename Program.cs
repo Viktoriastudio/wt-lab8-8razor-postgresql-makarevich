@@ -16,13 +16,18 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    db.Database.Migrate();
-}
-
-if (!app.Environment.IsDevelopment())
-{
-    app.UseExceptionHandler("/Error");
-    app.UseHsts();
+    try
+    {
+        db.Database.Migrate();
+        Console.WriteLine("=== База данных успешно подключена и миграции применены! ===");
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine("=== ОШИБКА ПОДКЛЮЧЕНИЯ К БД ===");
+        Console.WriteLine(ex.Message);
+        if (ex.InnerException != null)
+            Console.WriteLine("Inner: " + ex.InnerException.Message);
+    }
 }
 
 app.UseHttpsRedirection();
