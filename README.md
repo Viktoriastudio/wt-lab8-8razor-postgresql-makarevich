@@ -1,3 +1,3 @@
 # WT-8 Razor Pages
 
-Веб-приложение на ASP.NET Core Razor Pages для учёта задач IT-проектов.
+Веб-приложение на ASP.NET Core Razor Pages для управлению товарами.
